@@ -1,8 +1,11 @@
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 import tensorflow as tf
 import argparse
 
-from settings import FRAME_LEN
+
+from settings import FRAME_LEN, PREPROC_DIR
 from feature_labels import FEATURES
 from feature_labels import RHAND_IDX, LHAND_IDX, RPOSE_IDX, LPOSE_IDX
 from characters import char_to_num
@@ -151,19 +154,25 @@ def convert_fn(landmarks, phrase):
     return pre_process(landmarks), phrase
 
 
-def preprocess(tf_records: bytes, batch_size: int = 64):
-    print(type(tf_records))
-    # X = tf.data.TFRecordDataset(tf_records[:train_len])
-    # X = X.map(decode_fn)
-    # X = X.map(convert_fn)
+def preprocess(tf_records: str, batch_size: int = 64):
+    X = tf.data.TFRecordDataset(tf_records[:train_len])
+    print(type(X))
+    X = X.map(decode_fn)
+    print(type(X))
+    #X = X.map(convert_fn)
+    # print(type(X))
     # X = X.batch(batch_size)
+    # print(type(X))
     # X = X.prefetch(buffer_size=tf.data.AUTOTUNE)
-    return None #X.cache()
+    # print(type(X))
+    # X = X.cache()
+    # print(type(X))
+    return X
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse the TFRecord.')
-    parser.add_argument('--file', '-f', type=str,
+    parser.add_argument('--file', '-f', type=str, default='105143404.tfrecord',
                         help='The path to the TFRecord file.')
     args = parser.parse_args()
 
@@ -172,4 +181,4 @@ if __name__ == '__main__':
     train_len = int(0.8 * len(args.file))
 
     train_ds = preprocess(args.file[:train_len])
-    valid_ds = preprocess(args.file[train_len:])
+    #valid_ds = preprocess(args.file[train_len:])
