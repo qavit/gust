@@ -1,9 +1,3 @@
-    """_summary_
-
-    Returns:
-        _type_: _description_
-    """
-
 
 import tensorflow as tf
 import argparse
@@ -15,7 +9,7 @@ from characters import char_to_num
 from characters import START_TOKEN, END_TOKEN, PAD_TOKEN_IDX
 
 
-def resize_pad(x: tf.Tensor, frame_len: int = FRAME_LEN) -> tf.Tensor:
+def resize_pad(x, frame_len=FRAME_LEN):
     """Adjust the size of the input tensor and apply padding if necessary.
 
     If the number of frames (first dimension) is less than `frame_len`,
@@ -37,7 +31,7 @@ def resize_pad(x: tf.Tensor, frame_len: int = FRAME_LEN) -> tf.Tensor:
     return x
 
 
-def pre_process(x: tf.Tensor) -> tf.Tensor:
+def pre_process(x):
     """Process input data to determine the dominant hand based on NaN values
     and normalize hand and pose data.
 
@@ -68,20 +62,20 @@ def pre_process(x: tf.Tensor) -> tf.Tensor:
     rnans = tf.math.count_nonzero(rnan_idx)
     lnans = tf.math.count_nonzero(lnan_idx)
 
-    def split_xyz(body_part: tf.Tensor, idx: list) -> tuple:
+    def split_xyz(body_part, idx):
         """Split the x, y, z data for the body part"""
         part_x = body_part[:, 0*(len(idx)//3): 1*(len(idx)//3)]
         part_y = body_part[:, 1*(len(idx)//3): 2*(len(idx)//3)]
         part_z = body_part[:, 2*(len(idx)//3): 3*(len(idx)//3)]
         return part_x, part_y, part_z
 
-    def mirror(body_part: tf.Tensor, idx: list) -> tf.Tensor:
+    def mirror(body_part, idx):
         """Perform the left-right symmetry transformation,
         i.e. `x` -> `1-x`."""
         part_x, part_y, part_z = split_xyz(body_part, idx)
         return tf.concat([1 - part_x[0], part_y[1], part_z[2]], axis=1)
 
-    def unknown_action(body_part: tf.Tensor, idx: list) -> tf.Tensor:
+    def unknown_action(body_part, idx):
         part_x, part_y, part_z = split_xyz(body_part, idx)
         return tf.concat([part_x[..., tf.newaxis],
                           part_y[..., tf.newaxis],
