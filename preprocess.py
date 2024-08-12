@@ -1,3 +1,9 @@
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
+
 
 import tensorflow as tf
 import argparse
@@ -152,12 +158,13 @@ def convert_fn(landmarks, phrase):
 
 
 def preprocess(tf_records: bytes, batch_size: int = 64):
-    X = tf.data.TFRecordDataset(tf_records[:train_len])
-    X = X.map(decode_fn)
-    X = X.map(convert_fn)
-    X = X.batch(batch_size)
-    X = X.prefetch(buffer_size=tf.data.AUTOTUNE)
-    return X.cache()
+    print(type(tf_records))
+    # X = tf.data.TFRecordDataset(tf_records[:train_len])
+    # X = X.map(decode_fn)
+    # X = X.map(convert_fn)
+    # X = X.batch(batch_size)
+    # X = X.prefetch(buffer_size=tf.data.AUTOTUNE)
+    return None #X.cache()
 
 
 if __name__ == '__main__':

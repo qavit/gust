@@ -2,21 +2,9 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import matplotlib.pyplot as plt
-import json
-import os
 
-FRAME_LEN = 128
-
-with open(CHAR_TO_NUM, "r") as f:
-    char_to_num = json.load(f)
-
-pad_token_idx = 59
-start_token_id = 60
-end_token_id = 61
-
-char_to_num['P'] = pad_token_idx  # pad token
-char_to_num['<'] = start_token_id  # start token
-char_to_num['>'] = end_token_id  # end token
+from settings import FRAME_LEN
+from characters import char_to_num
 
 # Define the Transformer Input Layers
 
@@ -61,8 +49,8 @@ class LandmarkEmbedding(layers.Layer):
         x = self.conv2(x)
         return self.conv3(x)
 
-# Encoder layer for Transformer
 
+# Encoder layer for Transformer
 class TransformerEncoder(layers.Layer):
     def __init__(self, embed_dim, num_heads, feed_forward_dim, rate=0.1):
         super().__init__()
@@ -90,9 +78,9 @@ class TransformerEncoder(layers.Layer):
 # Decoder layer for Transformer
 # Customized to add `training` variable
 # Reference: https://www.kaggle.com/code/shlomoron/aslfr-a-simple-transformer/notebook
-
 class TransformerDecoder(layers.Layer):
-    def __init__(self, embed_dim, num_heads, feed_forward_dim, dropout_rate=0.1):
+    def __init__(self, embed_dim, num_heads,
+                 feed_forward_dim, dropout_rate=0.1):
         super().__init__()
         self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
         self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
@@ -100,7 +88,8 @@ class TransformerDecoder(layers.Layer):
         self.self_att = layers.MultiHeadAttention(
             num_heads=num_heads, key_dim=embed_dim
         )
-        self.enc_att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
+        self.enc_att = layers.MultiHeadAttention(num_heads=num_heads,
+                                                 key_dim=embed_dim)
         self.self_dropout = layers.Dropout(0.5)
         self.enc_dropout = layers.Dropout(0.1)
         self.ffn_dropout = layers.Dropout(0.1)
@@ -143,14 +132,14 @@ class TransformerDecoder(layers.Layer):
 
 # Complete the Transformer model
 
-# This model takes landmark coordinates as inputs and predicts a 
-# sequence of characters. The target character sequence, which has 
-# been shifted to the left is provided as the input to the decoder 
-# during training. The decoder employs its own past predictions during 
+# This model takes landmark coordinates as inputs and predicts a
+# sequence of characters. The target character sequence, which has
+# been shifted to the left is provided as the input to the decoder
+# during training. The decoder employs its own past predictions during
 # inference to forecast the next token.
 # ​
-# The **Levenshtein Distance** between sequences is used as the 
-# accuracy  since the evaluation metric for this contest is the 
+# The **Levenshtein Distance** between sequences is used as the
+# accuracy  since the evaluation metric for this contest is the
 # **Normalized Total Levenshtein Distance**.
 
 # Customized to add edit_dist metric and training variable.
@@ -178,7 +167,8 @@ class Transformer(keras.Model):
         self.target_maxlen = target_maxlen
         self.num_classes = num_classes
 
-        self.enc_input = LandmarkEmbedding(num_hid=num_hid, maxlen=source_maxlen)
+        self.enc_input = LandmarkEmbedding(num_hid=num_hid,
+                                           maxlen=source_maxlen)
         self.dec_input = TokenEmbedding(
             num_vocab=num_classes, maxlen=target_maxlen, num_hid=num_hid
         )
@@ -224,7 +214,7 @@ class Transformer(keras.Model):
 
         input_shape = tf.shape(target)
         batch_size = input_shape[0]
-        
+
         dec_input = target[:, :-1]
         dec_target = target[:, 1:]
         with tf.GradientTape() as tape:
@@ -352,7 +342,7 @@ class Transformer(keras.Model):
 
         input_shape = tf.shape(target)
         batch_size = input_shape[0]
-        
+
         dec_input = target[:, :-1]
         dec_target = target[:, 1:]
         with tf.GradientTape() as tape:
@@ -372,13 +362,13 @@ class Transformer(keras.Model):
         self.loss_metric.update_state(loss)
         return {"loss": self.loss_metric.result(), "edit_dist": self.acc_metric.result()}
 
-    def test_step(self, batch):        
+    def test_step(self, batch): 
         source = batch[0]
         target = batch[1]
 
         input_shape = tf.shape(target)
         batch_size = input_shape[0]
-        
+
         dec_input = target[:, :-1]
         dec_target = target[:, 1:]
         preds = self([source, dec_input])
@@ -450,19 +440,22 @@ class DisplayOutputs(keras.callbacks.Callback):
 # Transformer variables are customized from original keras tutorial to suit this dataset.
 # Reference: https://www.kaggle.com/code/shlomoron/aslfr-a-simple-transformer/notebook
 
+
 batch = next(iter(valid_ds))
 
 # The vocabulary to convert predicted indices into characters
 idx_to_char = list(char_to_num.keys())
 display_cb = DisplayOutputs(
-    batch, idx_to_char, target_start_token_idx=char_to_num['<'], target_end_token_idx=char_to_num['>']
+    batch, idx_to_char,
+    target_start_token_idx=char_to_num['<'],
+    target_end_token_idx=char_to_num['>']
 )  # set the arguments as per vocabulary index for '<' and '>'
 
 model = Transformer(
     num_hid=200,
     num_head=4,
     num_feed_forward=400,
-    source_maxlen = FRAME_LEN,
+    source_maxlen=FRAME_LEN,
     target_maxlen=64,
     num_layers_enc=2,
     num_layers_dec=1,
