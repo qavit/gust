@@ -160,14 +160,15 @@ class SequenceSample():
 
 
 if __name__ == '__name__':
-    parser = argparse.ArgumentParser(description='View the TFRecord.')
-    parser.add_argument('--file', '-f', type=str, default='105143404.tfrecord',
-                        help='The path to the TFRecord file.')
-    parser.add_argument('--info', '-i', action='store_true',
-                        help='Show info.')
-    args = parser.parse_args()
+    print(metadata_df)
+    # parser = argparse.ArgumentParser(description='View the TFRecord.')
+    # parser.add_argument('--file', '-f', type=str, default='105143404.tfrecord',
+    #                     help='The path to the TFRecord file.')
+    # parser.add_argument('--info', '-i', action='store_true',
+    #                     help='Show info.')
+    # args = parser.parse_args()
 
-    sample_sequence = SequenceSample(0)
+    # sample_sequence = SequenceSample(0)
 
-    if args.info:
-        print(sample_sequence.__dict__)
+    # if args.info:
+    #     print(sample_sequence.__dict__)

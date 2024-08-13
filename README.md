@@ -2,6 +2,18 @@
 A modularized version of https://www.kaggle.com/code/siniuho/gust0811
 
 
+### Install requirements
+Python 3.11
+```sh
+conda create --name tf python=3.11
+```
+
+(optional)
+```sh
+conda install -n tf 
+python -m ipykernel install --user --name tf
+```
+
 ### Install Kaggle API
 [Ref1](https://kai-huang.medium.com/%E6%9C%80%E9%BD%8A%E5%85%A8%E7%9A%84-kaggle-api-%E4%B8%AD%E6%96%87%E6%89%8B%E5%86%8A-%E4%B8%80-84c01174deb5)
 
@@ -23,12 +35,12 @@ mv ~/Downloads/kaggle.json ~/.kaggle/kaggle.json
 chmod 600 ~/.kaggle/kaggle.json
 ```
 
-###　Download Kaggle
+### Download Kaggle
 ```shell
 kaggle kernels output gusthema/asl-fingerspelling-recognition-w-tensorflow -p /path/to/dest
 ```
 
-`/path/to/dest` is the path to your download destination, for example, `D:\gust-1`.
+`/path/to/dest` is the path to your download destination, for example, `C:\Users\user\gust` or `~/gust`.
 
 **Bold** = building blocks
 - [ ] **`tranformer.py`**

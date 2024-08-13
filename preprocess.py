@@ -1,15 +1,15 @@
-import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+#!/usr/bin/env python3
 
+import os
 import tensorflow as tf
 import argparse
-
-
-from settings import FRAME_LEN, PREPROC_DIR
+from settings import FRAME_LEN
 from feature_labels import FEATURES
 from feature_labels import RHAND_IDX, LHAND_IDX, RPOSE_IDX, LPOSE_IDX
 from characters import char_to_num
 from characters import START_TOKEN, END_TOKEN, PAD_TOKEN_IDX
+
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 
 def resize_pad(x, frame_len=FRAME_LEN):
@@ -181,4 +181,4 @@ if __name__ == '__main__':
     train_len = int(0.8 * len(args.file))
 
     train_ds = preprocess(args.file[:train_len])
-    #valid_ds = preprocess(args.file[train_len:])
+    # valid_ds = preprocess(args.file[train_len:])

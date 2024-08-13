@@ -3,8 +3,6 @@ kaggle
 matplotlib
 mediapipe
 numpy<=1.26
-# opencv
 pandas
 pyarrow
-tf-keras
-tensorflow==2.16.1
+tensorflow
